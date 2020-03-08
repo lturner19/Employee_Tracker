@@ -22,35 +22,62 @@ connection.connect(function (err) {
 
 function start() {
     inquirer.prompt([{
-        type: "rawlist",
         name: "action",
+        type: "rawlist",
         message: "What would you like to do?",
-        choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager"]
+        choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", "Exit"]
     }]).then(function (input) {
         switch (input.action) {
             case "View All Employees":
-                view();
+                viewEmployee();
                 break;
             case "View Employees By Department":
                 viewDept();
                 break;
-            case "View Employees By Manager":
-                viewManager();
+            case "View Employees By Role":
+                viewRole();
                 break;
             case "Add Employee":
                 addEmployee();
                 break;
-            case "Remove Employee":
-                removeEmployee();
+            case "Add Employee Role":
+                addRole();
+                break;
+            case "Add Department":
+                addDept();
                 break;
             case "Update Employee Role":
                 updateRole();
                 break;
-            case "Update Employee Manager":
-                updateManager();
-                break;
-            default:
+            case "Exit":
                 connection.end();
+        }
+    });
+}
+
+function viewEmployee() {
+    connection.query("SELECT * FROM employee", function (err, res) {
+        if (err) throw err;
+        for (let index = 0; index < res.length; index++) {
+            console.log(res[i].First_Name + "||" + res[i].Last_Name + "||" + res[i].Role_Id + "||" + res[i].Manager_id);
+        }
+    });
+}
+
+function viewDept() {
+    connection.query("SELECT * FROM department", function (err, res) {
+        if (err) throw err;
+        for (let index = 0; index < res.length; index++) {
+            console.log(res[i].id + "||" + res[i].name)
+        }
+    });
+}
+
+function viewRole() {
+    connection.query("SELECT * FROM role", function (err, res) {
+        if (err) throw err;
+        for (let index = 0; index < res.length; index++) {
+            console.log(res[i].id + "||" + res[i].title + "||" + res[i].salary + "||" + res[i].department_id);
         }
     });
 }
