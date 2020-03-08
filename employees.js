@@ -23,9 +23,9 @@ connection.connect(function (err) {
 function start() {
     inquirer.prompt([{
         name: "action",
-        type: "rawlist",
+        type: "list",
         message: "What would you like to do?",
-        choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", "Exit"]
+        choices: ["View All Employees", "View Employees By Department", "View Employees By Role", "Add Employee", "Add Department", "Add Role","Update Employee Role", "Exit"]
     }]).then(function (input) {
         switch (input.action) {
             case "View All Employees":
@@ -40,7 +40,7 @@ function start() {
             case "Add Employee":
                 addEmployee();
                 break;
-            case "Add Employee Role":
+            case "Add Role":
                 addRole();
                 break;
             case "Add Department":
@@ -59,7 +59,8 @@ function viewEmployee() {
     connection.query("SELECT * FROM employee", function (err, res) {
         if (err) throw err;
         for (let index = 0; index < res.length; index++) {
-            console.log(res[i].First_Name + "||" + res[i].Last_Name + "||" + res[i].Role_Id + "||" + res[i].Manager_id);
+            console.log(res[index].First_Name + "||" + res[index].Last_Name + "||" + res[index].Role_Id + "||" + res[index].Manager_id);
+            start();
         }
     });
 }
@@ -68,7 +69,8 @@ function viewDept() {
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         for (let index = 0; index < res.length; index++) {
-            console.log(res[i].id + "||" + res[i].name)
+            console.log(res[index].id + "||" + res[index].name)
+            start();
         }
     });
 }
@@ -77,8 +79,9 @@ function viewRole() {
     connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
         for (let index = 0; index < res.length; index++) {
-            console.log(res[i].id + "||" + res[i].title + "||" + res[i].salary + "||" + res[i].department_id);
+            console.log(res[index].id + "||" + res[index].title + "||" + res[index].salary + "||" + res[index].department_id);
+            start();
         }
     });
 }
-
+ 
