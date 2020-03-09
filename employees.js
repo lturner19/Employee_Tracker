@@ -28,16 +28,16 @@ function start() {
         name: "action",
         type: "list",
         message: "What would you like to do?",
-        choices: ["View All Employees", "View Employees By Department", "View Employees By Role", "Add Employee", "Add Department", "Add Role", "Update Employee Role", "Exit"]
+        choices: ["View All Employees", "View All Departments", "View All Roles", "Add Employee", "Add Department", "Add Role", "Update Employee Role", "Exit"]
     }]).then(function (input) {
         switch (input.action) {
             case "View All Employees":
                 viewEmployee();
                 break;
-            case "View Employees By Department":
+            case "View All Departments":
                 viewDept();
                 break;
-            case "View Employees By Role":
+            case "View All Roles":
                 viewRole();
                 break;
             case "Add Employee":
@@ -76,7 +76,7 @@ function viewEmployee() {
 
 function viewDept() {
     //pulling information from the dept. table in sql database
-    connection.query("SELECT * FROM department", function (err, res) {
+    connection.query("SELECT Name FROM department", function (err, res) {
         if (err) throw err;
         //returning the information to the user and in the console.table format
         console.table(res);
@@ -87,9 +87,7 @@ function viewDept() {
 function viewRole() {
     //pulling info from role table in sql database
     connection.query(
-        `SELECT First_Name, Last_Name, Title
-        FROM employee
-        LEFT JOIN role ON employee.Role_Id = role.id;`, function (err, res) {
+        "SELECT Title FROM role", function (err, res) {
         if (err) throw err;
         //returning info in console.table format
         console.table(res);
