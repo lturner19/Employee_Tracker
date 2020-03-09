@@ -38,4 +38,6 @@ SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, departm
  SELECT * FROM department
 
 --  see employees by role
-SELECT * FROM role
+SELECT First_Name, Last_Name, Title
+FROM employee
+LEFT JOIN role ON employee.Role_Id = role.id;
