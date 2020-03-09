@@ -33,3 +33,9 @@ SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, departm
  left join employee employee2 on employee.id = employee2.Manager_Id
  left join role on employee.Role_Id = role.id
  left join department on role.Department_Id = department.id Order By employee.id;
+
+-- see employees by department 
+ SELECT * FROM department
+
+--  see employees by role
+SELECT * FROM role
