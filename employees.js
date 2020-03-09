@@ -62,19 +62,16 @@ function start() {
 function viewEmployee() {
     connection.query(
         //employee2 = alias for employee, allows the manager_id to be filled in with the manager name 
-        `
-    SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, department.name department, role.salary, concat(employee2.First_Name, " ", employee2.Last_Name) manager
- FROM employee 
- left join employee employee2 on employee.id = employee2.Manager_Id
- left join role on employee.Role_Id = role.id
- left join department on role.Department_Id = department.id Order By employee.id;
-    
-    `, function (err, res) {
-        if (err) throw err;
-       
-        console.table(res);
-        start();
-    });
+        `SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, department.name department, role.salary, concat(employee2.First_Name, " ", employee2.Last_Name) manager
+        FROM employee 
+        left join employee employee2 on employee.id = employee2.Manager_Id
+        left join role on employee.Role_Id = role.id
+        left join department on role.Department_Id = department.id Order By employee.id;`,
+        function (err, res) {
+            if (err) throw err;
+            console.table(res);
+            start();
+        });
 }
 
 function viewDept() {
@@ -82,17 +79,20 @@ function viewDept() {
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         //returning the information to the user and in the console.table format
-            console.table(res);
-            start();
+        console.table(res);
+        start();
     });
 }
+
 function viewRole() {
     //pulling info from role table in sql database
-    connection.query("SELECT * FROM role", function (err, res) {
+    connection.query(
+        `SELECT First_Name, Last_Name, Title
+        FROM employee
+        LEFT JOIN role ON employee.Role_Id = role.id;`, function (err, res) {
         if (err) throw err;
         //returning info in console.table format
         console.table(res);
             start();
     });
 }
-
