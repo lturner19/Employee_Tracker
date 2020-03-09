@@ -1,8 +1,7 @@
 //Dependency setup
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
-//creates access connection to the mysql database
+require("console.table");
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -11,7 +10,7 @@ var connection = mysql.createConnection({
     database: "employees_db"
 });
 
-//Connecting to the mysql database
+//Connecting to mysql database
 connection.connect(function (err) {
     if (err) throw err;
 
@@ -20,12 +19,13 @@ connection.connect(function (err) {
 
 });
 
+//begins the prompts and calls other functions based on the user's choice
 function start() {
     inquirer.prompt([{
         name: "action",
         type: "list",
         message: "What would you like to do?",
-        choices: ["View All Employees", "View Employees By Department", "View Employees By Role", "Add Employee", "Add Department", "Add Role","Update Employee Role", "Exit"]
+        choices: ["View All Employees", "View Employees By Department", "View Employees By Role", "Add Employee", "Add Department", "Add Role", "Update Employee Role", "Exit"]
     }]).then(function (input) {
         switch (input.action) {
             case "View All Employees":
@@ -55,33 +55,39 @@ function start() {
     });
 }
 
+//allows the full amount of info about the employees, from the three tables in the sql database, to be viewed by left joining the three tables
 function viewEmployee() {
-    connection.query("SELECT * FROM employee", function (err, res) {
+    connection.query(
+        //employee2 = alias for employee, allows the manager_id to be filled in with the manager name 
+        `
+    SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, department.name department, role.salary, concat(employee2.First_Name, " ", employee2.Last_Name) manager
+ FROM employee 
+ left join employee employee2 on employee.id = employee2.Manager_Id
+ left join role on employee.Role_Id = role.id
+ left join department on role.Department_Id = department.id Order By employee.id;
+    
+    `, function (err, res) {
         if (err) throw err;
-        for (let index = 0; index < res.length; index++) {
-            console.log(res[index].First_Name + "||" + res[index].Last_Name + "||" + res[index].Role_Id + "||" + res[index].Manager_id);
-            start();
-        }
+       
+        console.table(res);
+        start();
     });
 }
 
 function viewDept() {
+    //pulling information from the dept. table in sql
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
-        for (let index = 0; index < res.length; index++) {
-            console.log(res[index].id + "||" + res[index].name)
+        //returning the information to the user and in the console.table format
+            console.table(res);
             start();
-        }
     });
 }
-
 function viewRole() {
     connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
-        for (let index = 0; index < res.length; index++) {
-            console.log(res[index].id + "||" + res[index].title + "||" + res[index].salary + "||" + res[index].department_id);
+        console.table(res);
             start();
-        }
     });
 }
- 
+
