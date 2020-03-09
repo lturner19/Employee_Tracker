@@ -1,7 +1,11 @@
 //Dependency setup
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-require("console.table");
+
+//do not want as a variable
+require("console.table")
+
+//Accessing the mysql table
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -10,7 +14,6 @@ var connection = mysql.createConnection({
     database: "employees_db"
 });
 
-//Connecting to mysql database
 connection.connect(function (err) {
     if (err) throw err;
 
@@ -75,7 +78,7 @@ function viewEmployee() {
 }
 
 function viewDept() {
-    //pulling information from the dept. table in sql
+    //pulling information from the dept. table in sql database
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         //returning the information to the user and in the console.table format
@@ -84,8 +87,10 @@ function viewDept() {
     });
 }
 function viewRole() {
+    //pulling info from role table in sql database
     connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
+        //returning info in console.table format
         console.table(res);
             start();
     });
