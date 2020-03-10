@@ -1,12 +1,13 @@
 //Dependency setup
-var mysql = require("mysql");
-var inquirer = require("inquirer");
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+
 
 //do not want as a variable
 require("console.table")
 
 //Accessing the mysql table
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
@@ -43,11 +44,11 @@ function start() {
             case "Add Employee":
                 addEmployee();
                 break;
-            case "Add Role":
-                addRole();
-                break;
             case "Add Department":
                 addDept();
+                break;
+            case "Add Role":
+                addRole();
                 break;
             case "Update Employee Role":
                 updateRole();
@@ -87,10 +88,91 @@ function viewDept() {
 function viewRole() {
     //pulling info from role table in sql database
     connection.query(
-        "SELECT Title FROM role", function (err, res) {
-        if (err) throw err;
-        //returning info in console.table format
-        console.table(res);
+        "SELECT Title FROM role",
+        function (err, res) {
+            if (err) throw err;
+            //returning info in console.table format
+            console.table(res);
             start();
+        });
+}
+
+function roleChoice() {
+    return new Promise((resolve, reject) => {
+        connection.query("Select Title FROM role", function (err, data) {
+            if (err) throw err;
+            resolve(data);
+        })
+    })
+}
+
+
+function managerChoice() {
+    return new Promise((resolve, reject) => {
+        connection.query(`Select concat(employee.First_Name," ", employee.Last_Name) manager FROM employee`, function (err, data) {
+            if (err) throw err;
+            //console.log(data);
+            resolve(data);
+        })
     });
 }
+
+function lookUpId(tableName, columnName, value) {
+    return new Promise((resolve, reject) => {
+        let statement = connection.query(`Select Id FROM ${tableName} WHERE ${columnName} = ${value}`, function (err, data) {
+            if (err) throw err;
+            resolve(data)
+        })
+    })
+}
+
+
+function addEmployee() {
+
+    let titleList = [];
+    let managerList = [];
+
+    roleChoice().then(function (titles) {
+        titleList = titles.map(role => role.Title)
+
+        managerChoice().then(function (managers) {
+            managerList = managers.map(manager => manager.manager)
+
+            inquirer.prompt([{
+                    name: "firstName",
+                    type: "input",
+                    message: "What is the employee's first name?"
+                },
+                {
+                    name: "lastName",
+                    type: "input",
+                    message: "What is the employee's last name?"
+                },
+                {
+                    name: "role",
+                    type: "list",
+                    message: "What is the employee's role?",
+                    choices: titleList
+                },
+                {
+                    name: "manager",
+                    type: "list",
+                    message: "Who is the employee's manager?",
+                    choices: managerList
+                }
+            ]).then(function (input) {
+                lookUpId("role", "title", "input.role").then(function (titleData) {
+                    lookUpId("employee", "concat(First_Name, ' ', Last_Name)", input.manager).then(function (managerData) {
+
+                        connection.query(`INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", "${input.role}", "${input.manager}")`,
+                            function (err, data) {
+                                if (err) throw err;
+                                //need to fix where error
+                            })
+                    })
+                })
+            })
+        })
+    })
+}
+
