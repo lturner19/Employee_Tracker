@@ -27,10 +27,12 @@ Manager_Id INT NULL,
 PRIMARY KEY (Id)
 );
 
+
 -- Joining all three tables together to render all employees and info about them for the View All Employees requirement
+-- changed order of from employee.id = employee.Manager_id (was impacting ability to show manager when new employee is created)
 SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, department.name department, role.salary, concat(employee2.First_Name, " ", employee2.Last_Name) manager
  FROM employee 
- left join employee employee2 on employee.id = employee2.Manager_Id
+ left join employee employee2 on employee.Manager_Id = employee2.id
  left join role on employee.Role_Id = role.id
  left join department on role.Department_Id = department.id Order By employee.id;
 
