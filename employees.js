@@ -13,7 +13,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "",
+       password: "Calomal15!",
     database: "employees_db"
 });
 
@@ -77,7 +77,7 @@ function viewEmployees() {
         //employee2 = alias for employee, allows the manager_id to be filled in with the manager name
         `SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, department.name department, role.salary, concat(employee2.First_Name, " ", employee2.Last_Name) manager
         FROM employee 
-        left join employee employee2 on employee.id = employee2.Manager_Id
+        left join employee employee2 on employee.Manager_Id = employee2.id
         left join role on employee.Role_Id = role.id
         left join department on role.Department_Id = department.id Order By employee.id;`,
         function (err, res) {
@@ -121,7 +121,7 @@ function roleChoice() {
 function managerChoice() {
     return new Promise((resolve, reject) => {
         connection.query(
-            `Select Manager_Id, concat(employee.First_Name," ", employee.Last_Name) manager FROM employee`,
+            `Select id, concat(employee.First_Name," ", employee.Last_Name) manager FROM employee`,
             function (err, data) {
                 if (err) throw err;
                 //console.log(data);
@@ -176,18 +176,16 @@ function addEmployee() {
                     }
                 ])
                 .then(function (input) {
-
                     const selectedManager = managers.find(item => item.manager === input.manager);
                     console.log("test", selectedManager);
                     lookUpId("role", "title", input.role).then(function (titleData) {
                         // console.log("table", titleData[0].Id);
                         lookUpId("employee", "concat(First_Name, ' ', Last_Name)", input.manager).then(function (managerData) {
-                            console.log("table", managerData)
-                            connection.query(
-                                console.log(`INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", ${titleData[0].Id}, ${selectedManager.Manager_Id}`)
-                                
-                                
-                                `INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", ${titleData[0].Id}, ${selectedManagerinput.Manager_Id})`,
+                            console.log("table", managerData);
+
+                            console.log(`INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", ${titleData[0].Id}, ${selectedManager.id}`);
+
+                            connection.query(`INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", ${titleData[0].Id}, ${selectedManager.id})`,
 
                                 function (err, res) {
                                     if (err) throw err;
