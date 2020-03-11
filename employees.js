@@ -121,7 +121,7 @@ function roleChoice() {
 function managerChoice() {
     return new Promise((resolve, reject) => {
         connection.query(
-            `Select concat(employee.First_Name," ", employee.Last_Name) manager FROM employee`,
+            `Select Manager_Id, concat(employee.First_Name," ", employee.Last_Name) manager FROM employee`,
             function (err, data) {
                 if (err) throw err;
                 //console.log(data);
@@ -134,7 +134,7 @@ function managerChoice() {
 function lookUpId(tableName, columnName, value) {
     return new Promise((resolve, reject) => {
         let statement = connection.query(
-            `Select Id FROM ${tableName} WHERE ${columnName} = ${value}`,
+            `Select Id FROM ${tableName} WHERE ${columnName} = '${value}'`,
             function (err, data) {
                 if (err) throw err;
                 resolve(data);
@@ -176,38 +176,45 @@ function addEmployee() {
                     }
                 ])
                 .then(function (input) {
-                    // lookUpId("role", "title", input.role).then(function (titleData) {
-                    // lookUpId("employee", "concat(First_Name, ' ', Last_Name)", input.manager).then(function (managerData) {
 
-                    connection.query(
-                        `INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", "${input.role}", "${input.manager}")`,
-                        function (err, res) {
-                            if (err) throw err;
-                            //need to fix where error
-                        }
-                    );
+                    const selectedManager = managers.find(item => item.manager === input.manager);
+                    console.log("test", selectedManager);
+                    lookUpId("role", "title", input.role).then(function (titleData) {
+                        // console.log("table", titleData[0].Id);
+                        lookUpId("employee", "concat(First_Name, ' ', Last_Name)", input.manager).then(function (managerData) {
+                            console.log("table", managerData)
+                            connection.query(
+                                console.log(`INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", ${titleData[0].Id}, ${selectedManager.Manager_Id}`)
+                                
+                                
+                                `INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id) VALUES("${input.firstName}", "${input.lastName}", ${titleData[0].Id}, ${selectedManagerinput.Manager_Id})`,
+
+                                function (err, res) {
+                                    if (err) throw err;
+                                    console.table(viewEmployees())
+                                    start();
+                                }
+                            );
+                        });
+                    });
                 });
-        });
-    });
-    //})
-    //})
+        })
+    })
 }
 
 function addDept() {
-    inquirer.prompt([
-        {
+    inquirer.prompt([{
             name: "department",
             type: "input",
             message: "What department would you like to add?"
         }])
         .then(function (input) {
             //inserting the user's input into the mysql database
-            connection.query(`INSERT INTO department (name) VALUES("${input.department}")`,function (err, res) {
-                    if (err) throw err;
-                    console.table(viewDept());
-                    start();
-                }
-            );
+            connection.query(`INSERT INTO department (name) VALUES("${input.department}")`, function (err, res) {
+                if (err) throw err;
+                console.table(viewDept());
+                start();
+            });
         });
 }
 // ----------------------------------addRole function---------------------------------------------
@@ -224,8 +231,7 @@ function addRole() {
     deptChoice().then(function (id) {
         idList = id.map(department => department.id)
 
-        inquirer.prompt([
-            {
+        inquirer.prompt([{
                     name: "title",
                     type: "input",
                     message: "What role would you like to add?"
@@ -238,12 +244,12 @@ function addRole() {
                 {
                     name: "deptId",
                     type: "list",
-                    message: "What department should the role added to?",
+                    message: "What department should the role be added to?",
                     choices: idList
                 }
             ])
             .then(function (input) {
-                connection.query( `INSERT INTO role (title, salary, department_id) VALUES("${input.title}", ${input.salary}, ${input.deptId})`,
+                connection.query(`INSERT INTO role (title, salary, department_id) VALUES("${input.title}", ${input.salary}, ${input.deptId})`,
                     function (err, res) {
                         if (err) throw err;
                         console.table(viewrole());
@@ -269,30 +275,29 @@ function updateRole() {
 
     employeeChoice().then(function (employees) {
         employeeList = employees.map(employee => employee.First_Name)
-    
-    roleChoice().then(function (titles) {
-        titleList = titles.map(role => role.Title);
 
-        inquirer.prompt([
-             {
-                name: "pickEmployee",
-                type: "list",
-                message: "Which employee do you want to update?",
-                choices: employeeList
-            }, 
-            {
-                name: "updateTitle",
-                type: "list",
-                message: "What is the employee's new title?",
-                choices: titleList
-            }
-        ]).then(function (input) {
-            connection.query(`INSERT INTO role (title) VALUE("${input.updateTitle}")`, function (err, res) {
-                if (err) throw err;
-                console.table(viewEmployees());
+        roleChoice().then(function (titles) {
+            titleList = titles.map(role => role.Title);
+
+            inquirer.prompt([{
+                    name: "pickEmployee",
+                    type: "list",
+                    message: "Which employee do you want to update?",
+                    choices: employeeList
+                },
+                {
+                    name: "updateTitle",
+                    type: "list",
+                    message: "What is the employee's new title?",
+                    choices: titleList
+                }
+            ]).then(function (input) {
+                connection.query(`INSERT INTO role (title) VALUE("${input.updateTitle}")`, function (err, res) {
+                    if (err) throw err;
+
+                })
+                start();
             })
-            start();
         })
     })
-  })
 }
