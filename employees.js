@@ -1,7 +1,3 @@
-//global variable for addEmployee and updateRole functions
-//array holds title names from role table in sql db
-
-
 //Dependency setup
 const mysql = require("mysql");
 const inquirer = require("inquirer");
@@ -66,8 +62,9 @@ function start() {
                 case "Update Employee Role":
                     updateRole();
                     break;
-                case "Exit":
+                default:
                     connection.end();
+                    break;
             }
         });
 }
@@ -145,7 +142,7 @@ function lookUpId(tableName, columnName, value) {
 }
 
 function addEmployee() {
-    let titleList = [];
+    let titleData=[]; //holding array of role titles
     let managerList = []; //holding array of manager names
 
 
@@ -252,6 +249,7 @@ function addRole() {
                 }
             ])
             .then(function (input) {
+                //inserting user data input into the mysql database
                 connection.query(`INSERT INTO role (title, salary, department_id) VALUES("${input.title}", ${input.salary}, ${input.deptId})`,
                     function (err, res) {
                         if (err) throw err;
@@ -265,6 +263,7 @@ function addRole() {
 // -------------------------------Update employee role ------------------------------------------------------------------------------------
 function employeeChoice() {
     return new Promise((resolve, reject) => {
+    
         connection.query(`Select First_Name FROM employee`, function (err, data) {
             if (err) throw err;
             console.log("test 0", data);
@@ -274,18 +273,20 @@ function employeeChoice() {
 }
 
 function updateRole() {
-    let employeeList = [];
-    let titleList = [];
 
+    // holding the list of employees by first names
+    let employeeList = [];
+
+    let titleData = [];
     employeeChoice().then(function (employees) {
         employeeList = employees.map(employee => employee.First_Name)
 
-        //console.log("test1", employeeList);
+      //  console.log("test1", employeeList);
 
         roleChoice().then(function (titles) {
             titleList = titles.map(role => role.Title);
 
-           // console.log("test2", titleList);
+            console.log("test2", titleList);
 
             inquirer.prompt([{
                     name: "pickEmployee",
@@ -301,19 +302,15 @@ function updateRole() {
                 }
             ]).then(function (input) {
                 lookUpId("role", "title", input.role).then(function (titleData) {
-                    console.log("test 3", titleData[0].Id)
+                   // console.log("test 3", titleData[0].Id)
+                   //employeeData = array of employee id #'s
                     lookUpId("employee", "First_Name", input.pickEmployee).then(function (employeeData) {
-                       // console.log("test4", "Update employee set? Where ?", [{ First_Name: input.pickEmployee}, {Role_Id: titleData[0].Id}])
-                        connection.query("UPDATE employee SET ? WHERE ?", 
-                        [{
-                            First_Name: input.pickEmployee
-                        }, 
-                        {
-                            Role_Id: titleData[0].Id
-
-                        }], function (err, res) {
+                        //console.log("test 5", employeeData)
+                        //console.log("test4",`Update employee set? Where ?", [{ First_Name: input.pickEmployee}, {Role_Id: titleData[0].Id}])
+                       //updating the user's chosen employee with the new role
+                       connection.query(`UPDATE employee SET First_Name = "${input.pickEmployee}", Role_Id=${titleData[0].Id} Where Id = ${employeeData[0].Id}`, function (err, res) {
                             if (err) throw err;
-                            console.table(res);
+                            console.table(viewEmployees());
                             start();
                         })
                     })
