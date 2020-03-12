@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS employees_db;
+
 CREATE DATABASE employees_db;
 
 USE employees_db;
@@ -38,7 +40,7 @@ SELECT employee.id, employee.First_Name, employee.Last_Name, role.title, departm
 
 
 
--- Data taken from the homework gif 
+--Initial table values
 INSERT INTO department(name)
 VALUES("Sales"),("Engineering"),("Finance"),("Legal");
 
@@ -47,8 +49,6 @@ VALUES ("Sales Lead", 150000.00, 1), ("Salesperson", 130000.00, 1), ("Lead Engin
 
 INSERT INTO employee (First_Name, Last_Name, Role_Id, Manager_Id)
 VALUES("John", "Doe", 1, 3), ("Mike", "Chan", 2, 1), ("Ashely", "Rodriquez", 3, null), ("Kevin", "Tupik", 3, 4), ("Malia", "Brown", 5, null), ("Sarah", "Lourd", 6, null), ("Tom", "Allen", 7, 7), ("Christian", "Eckenrode", 3, 2);
-
-
 
 
 
