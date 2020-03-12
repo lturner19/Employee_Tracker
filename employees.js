@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "Calomal15!",
+    password: "",
     database: "employees_db"
 });
 
@@ -142,7 +142,7 @@ function lookUpId(tableName, columnName, value) {
 }
 
 function addEmployee() {
-    let titleData=[]; //holding array of role titles
+    let titleData = []; //holding array of role titles
     let managerList = []; //holding array of manager names
 
 
@@ -191,8 +191,7 @@ function addEmployee() {
                                 function (err, res) {
                                     if (err) throw err;
 
-                                    console.log(viewEmployees())
-                                    start();
+                                    console.table(viewEmployees())
                                 }
                             );
                         });
@@ -213,7 +212,7 @@ function addDept() {
             connection.query(`INSERT INTO department (name) VALUES("${input.department}")`, function (err, res) {
                 if (err) throw err;
                 console.table(viewDept());
-                start();
+
             });
         });
 }
@@ -253,8 +252,7 @@ function addRole() {
                 connection.query(`INSERT INTO role (title, salary, department_id) VALUES("${input.title}", ${input.salary}, ${input.deptId})`,
                     function (err, res) {
                         if (err) throw err;
-                        console.table(viewrole());
-                        start();
+                        console.table(viewRole());
                     });
             });
     });
@@ -263,10 +261,10 @@ function addRole() {
 // -------------------------------Update employee role ------------------------------------------------------------------------------------
 function employeeChoice() {
     return new Promise((resolve, reject) => {
-    
+
         connection.query(`Select First_Name FROM employee`, function (err, data) {
             if (err) throw err;
-            console.log("test 0", data);
+            //console.log("test 0", data);
             resolve(data);
         });
     });
@@ -281,12 +279,12 @@ function updateRole() {
     employeeChoice().then(function (employees) {
         employeeList = employees.map(employee => employee.First_Name)
 
-      //  console.log("test1", employeeList);
+        //  console.log("test1", employeeList);
 
         roleChoice().then(function (titles) {
             titleList = titles.map(role => role.Title);
 
-            console.log("test2", titleList);
+            //console.log("test2", titleList);
 
             inquirer.prompt([{
                     name: "pickEmployee",
@@ -302,16 +300,16 @@ function updateRole() {
                 }
             ]).then(function (input) {
                 lookUpId("role", "title", input.role).then(function (titleData) {
-                   // console.log("test 3", titleData[0].Id)
-                   //employeeData = array of employee id #'s
+                    // console.log("test 3", titleData[0].Id)
+                    //employeeData = array of employee id #'s
                     lookUpId("employee", "First_Name", input.pickEmployee).then(function (employeeData) {
                         //console.log("test 5", employeeData)
                         //console.log("test4",`Update employee set? Where ?", [{ First_Name: input.pickEmployee}, {Role_Id: titleData[0].Id}])
-                       //updating the user's chosen employee with the new role
-                       connection.query(`UPDATE employee SET First_Name = "${input.pickEmployee}", Role_Id=${titleData[0].Id} Where Id = ${employeeData[0].Id}`, function (err, res) {
+                        //updating the user's chosen employee with the new role
+                        connection.query(`UPDATE employee SET First_Name = "${input.pickEmployee}", Role_Id=${titleData[0].Id} Where Id = ${employeeData[0].Id}`, function (err, res) {
                             if (err) throw err;
                             console.table(viewEmployees());
-                            start();
+
                         })
                     })
                 })
