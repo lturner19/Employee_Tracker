@@ -49,7 +49,7 @@ The user has the ability to add:
 3. Users should enter their own personal mySQL password in the mySQL connection.
 
 ## PREVIEW
-
+<img src="assets\Employee Tracker (1).gif">
 <br>
 
 ### RESOURCES
@@ -64,6 +64,6 @@ Naereen Badges: https://github.com/Naereen/badges
 <br>
 
 ### BADGES
-Please click badge below
 
-forthebadge
+
+[![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
