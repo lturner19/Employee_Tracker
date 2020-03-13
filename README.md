@@ -36,13 +36,17 @@ The user has the ability to add:
 <br>
 
 ## INSTALLATION
-To run this program install (npm install) the following dependencies:
+1. To run this program install (npm install) the following dependencies:
 
-mysql: interact with mysql database
-inquirer: to prompt users with questions and obtain input
-console.table: to print mysql rows to the console
+    a. mysql: interact with mysql database
 
-The user will also need to install mySQL in order to create a database using the employees_db seed file.
+    b. inquirer: to prompt users with questions and obtain input
+
+    c. console.table: to print mysql rows to the console
+
+2. The user will also need to install mySQL in order to create a database using the employees_db seed file.
+
+3. Users should enter their own personal mySQL password in the mySQL connection.
 
 ## PREVIEW
 
